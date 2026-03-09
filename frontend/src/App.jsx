@@ -51,7 +51,7 @@ function App() {
         
         {/* --- NEW INSTITUTIONAL BANNER --- */}
         <div className="institutional-banner">
-          <img src="/reva-logo.png" alt="University Logo" className="uni-logo" />
+          <img src="frontend/reva-logo.png" alt="University Logo" className="uni-logo" />
           <div className="academic-details">
             <h2 className="uni-name">REVA UNIVERSITY</h2>
             <p className="dept-name">B.Tech in Artificial Intelligence & Data Science • 6th Semester</p>
