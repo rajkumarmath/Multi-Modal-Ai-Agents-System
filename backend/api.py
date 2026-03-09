@@ -106,4 +106,9 @@ async def run_master_system(request: UserRequest):
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    import os
+    
+    # Get the port from Render's environment, default to 8000 if not found
+    port = int(os.environ.get("PORT", 8000))
+    
+    uvicorn.run(app, host="0.0.0.0", port=port)
