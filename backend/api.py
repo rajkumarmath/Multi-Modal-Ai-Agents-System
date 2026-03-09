@@ -1,11 +1,13 @@
 import os
 from fastapi import FastAPI
 from pydantic import BaseModel
-from crewai import Agent, Task, Crew, Process, LLM
+from crewai import Agent, Task, Crew, Process
 from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
 
-# Load environment variables
+# NEW: Import the model provider directly to avoid 'crewai' path issues
+from langchain_google_genai import ChatGoogleGenerativeAI
+
 load_dotenv()
 
 app = FastAPI(title="Cognitive Architecture API")
@@ -17,12 +19,17 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# --- THE FIX: USE THE CORRECT GEMINI MODEL STRING ---
-# Use gemini-1.5-flash as it is the most stable free-tier model on Google AI Studio
-master_llm = LLM(
-    model="gemini/gemini-2.5-flash",
-    api_key=os.environ.get("GEMINI_API_KEY")
+# --- THE BULLETPROOF INTEGRATION ---
+# This bypasses the 'crewai' internal LLM routing and uses the stable LangChain provider
+master_llm = ChatGoogleGenerativeAI(
+    model="gemini-1.5-flash",
+    google_api_key=os.environ.get("GEMINI_API_KEY")
 )
+
+# ... (Keep your existing agents and tasks exactly as they are) ...
+# When you define your Agents, you don't even need to change anything else!
+# Just pass 'master_llm' into the llm= parameter of your agents.
+
 
 
 class UserRequest(BaseModel):
@@ -114,6 +121,7 @@ if __name__ == "__main__":
     port = int(os.environ.get("PORT", 8000))
     
     uvicorn.run(app, host="0.0.0.0", port=port)
+
 
 
 
