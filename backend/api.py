@@ -1,8 +1,7 @@
 import os
 from fastapi import FastAPI
 from pydantic import BaseModel
-from crewai import Agent, Task, Crew, Process
-from crewai.llms.llm import LLM
+from crewai import Agent, Task, Crew, Process, LLM
 from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
 
@@ -18,11 +17,13 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# --- THE FIX: USE GEMINI 1.5 FLASH (1 Million Token Limit) ---
+# --- THE FIX: USE THE CORRECT GEMINI MODEL STRING ---
+# Use gemini-1.5-flash as it is the most stable free-tier model on Google AI Studio
 master_llm = LLM(
     model="gemini/gemini-2.5-flash",
     api_key=os.environ.get("GEMINI_API_KEY")
 )
+
 
 class UserRequest(BaseModel):
     prompt: str
@@ -113,6 +114,7 @@ if __name__ == "__main__":
     port = int(os.environ.get("PORT", 8000))
     
     uvicorn.run(app, host="0.0.0.0", port=port)
+
 
 
 
