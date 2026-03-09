@@ -22,7 +22,7 @@ app.add_middleware(
 # --- THE BULLETPROOF INTEGRATION ---
 # This bypasses the 'crewai' internal LLM routing and uses the stable LangChain provider
 master_llm = ChatGoogleGenerativeAI(
-    model="gemini-1.5-flash",
+    model="gemini-2.5-flash",
     google_api_key=os.environ.get("GEMINI_API_KEY")
 )
 
@@ -121,6 +121,7 @@ if __name__ == "__main__":
     port = int(os.environ.get("PORT", 8000))
     
     uvicorn.run(app, host="0.0.0.0", port=port)
+
 
 
 
