@@ -1,8 +1,7 @@
 import os
 from fastapi import FastAPI
 from pydantic import BaseModel
-from crewai import Agent, Task, Crew, Process
-from crewai.llm import LLM
+from crewai import Agent, Task, Crew, Process, LLM
 from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
 
@@ -113,4 +112,5 @@ if __name__ == "__main__":
     port = int(os.environ.get("PORT", 8000))
     
     uvicorn.run(app, host="0.0.0.0", port=port)
+
 
