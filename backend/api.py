@@ -84,15 +84,7 @@ async def run_master_system(request: UserRequest):
     # EXECUTION
     # ==========================================
     
-    # 1. Handle the Router Result (Type-safe)
-    if hasattr(route_result, 'raw'):
-        decision = route_result.raw.strip().upper()
-    else:
-        decision = str(route_result).strip().upper()
-
-    agent_reports = []
-    
-    # 2. Run the chosen crew
+    # 1. Capture the result first
     if "TECHNICAL" in decision:
         final_result = tech_crew.kickoff()
         team_used = "Technical"
@@ -102,15 +94,15 @@ async def run_master_system(request: UserRequest):
         team_used = "Business"
         target_crew = business_crew
 
-    # 3. Handle the Final Result (Type-safe)
-    if hasattr(final_result, 'raw'):
-        final_summary = final_result.raw
-    else:
-        final_summary = str(final_result)
+    # 2. THE FIX: Cast everything to string immediately to avoid 'AttributeError'
+    # We do not use .raw anymore. We convert the whole result to string.
+    final_summary = str(final_result)
 
-    # 4. Extract individual agent outputs
+    # 3. Extract individual agent outputs
+    agent_reports = []
     for task in target_crew.tasks:
-        output_text = task.output.raw if hasattr(task.output, 'raw') else str(task.output)
+        # Just convert to string, don't look for .raw
+        output_text = str(task.output)
         agent_reports.append({
             "agent_role": task.agent.role,
             "output": output_text
