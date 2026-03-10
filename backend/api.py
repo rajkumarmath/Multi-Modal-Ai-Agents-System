@@ -80,50 +80,40 @@ async def run_master_system(request: UserRequest):
     task_tech_5 = Task(description='Combine the system architecture, frontend layout, backend APIs, and security audit into a highly structured 4-section Technical Blueprint.', expected_output='Final structured technical architecture document.', agent=tech_lead)
 
     tech_crew = Crew(agents=[system_architect, frontend_dev, backend_dev, secops_agent, tech_lead], tasks=[task_tech_1, task_tech_2, task_tech_3, task_tech_4, task_tech_5], process=Process.sequential)
-
-# ==========================================
+    # ==========================================
     # EXECUTION
     # ==========================================
     agent_reports = []
     
+    # Run the correct crew
     if "TECHNICAL" in decision:
         final_result = tech_crew.kickoff()
         team_used = "Technical"
-        # Extract individual agent outputs
-        for task in tech_crew.tasks:
-            agent_reports.append({
-                "agent_role": task.agent.role,
-                "output": task.output.raw
-            })
+        target_crew = tech_crew
     else:
         final_result = business_crew.kickoff()
         team_used = "Business"
-        # Extract individual agent outputs
-        for task in business_crew.tasks:
-            agent_reports.append({
-                "agent_role": task.agent.role,
-                "output": task.output.raw
-            })
+        target_crew = business_crew
 
-    # Return the structured data to the frontend
+    # --- THE FIX: Handle both string and object return types ---
+    if hasattr(final_result, 'raw'):
+        final_summary = final_result.raw
+    else:
+        final_summary = str(final_result)
+
+    # Extract individual agent outputs
+    for task in target_crew.tasks:
+        # Some versions use task.output.raw, others use task.output
+        output_text = task.output.raw if hasattr(task.output, 'raw') else str(task.output)
+        agent_reports.append({
+            "agent_role": task.agent.role,
+            "output": output_text
+        })
+
     return {
         "status": "success",
         "routed_team": team_used,
-        "final_summary": final_result.raw,
+        "final_summary": final_summary,
         "agent_reports": agent_reports
     }
-
-if __name__ == "__main__":
-    import uvicorn
-    import os
     
-    # Get the port from Render's environment, default to 8000 if not found
-    port = int(os.environ.get("PORT", 8000))
-    
-    uvicorn.run(app, host="0.0.0.0", port=port)
-
-
-
-
-
-
